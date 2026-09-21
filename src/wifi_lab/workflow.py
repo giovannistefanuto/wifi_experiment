@@ -14,7 +14,7 @@ from .commands import (
     hashcat_command,
     scan_command,
 )
-from .models import AccessPoint, Settings, Target
+from .models import AssociatedClient, AccessPoint, ScanResult, Settings, Target
 from .runner import CommandRunner
 from .scan import parse_airodump_csv
 
@@ -46,23 +46,35 @@ def doctor(runner: CommandRunner, settings: Settings) -> bool:
     return ok
 
 
-def scan_networks(runner: CommandRunner, settings: Settings, seconds: int) -> list[AccessPoint]:
+def scan_networks(runner: CommandRunner, settings: Settings, seconds: int) -> ScanResult:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     scan_dir = settings.output_dir / "scans" / stamp
     prefix = scan_dir / "scan"
     scan_dir.mkdir(parents=True, exist_ok=True)
     process = runner.start(scan_command(settings.monitor_interface, prefix), scan_dir / "airodump.log")
     if runner.dry_run:
-        return [
-            AccessPoint(
-                bssid=target.bssid,
-                channel=target.channel,
-                privacy="LAB-DRY-RUN",
-                power=None,
-                essid=target.essid,
+        return ScanResult(
+            access_points=tuple(
+                AccessPoint(
+                    bssid=target.bssid,
+                    channel=target.channel,
+                    privacy="LAB-DRY-RUN",
+                    power=None,
+                    essid=target.essid,
+                )
+                for target in settings.targets
             )
-            for target in settings.targets
-        ]
+            ,
+            clients=tuple(
+                AssociatedClient(
+                    mac=target.client_mac,
+                    bssid=target.bssid,
+                    power=None,
+                )
+                for target in settings.targets
+                if target.client_mac
+            ),
+        )
     try:
         time.sleep(seconds)
     finally:
@@ -77,10 +89,10 @@ def authorized_target(ap: AccessPoint, settings: Settings) -> Target | None:
     return next((target for target in settings.targets if target.bssid == ap.bssid), None)
 
 
-def display_networks(aps: list[AccessPoint], settings: Settings) -> None:
+def display_networks(scan: ScanResult, settings: Settings) -> None:
     print("\nReti rilevate")
     print("ID  AUT  CH   PWR   SICUREZZA        BSSID              ESSID")
-    for index, ap in enumerate(aps, 1):
+    for index, ap in enumerate(scan.access_points, 1):
         target = authorized_target(ap, settings)
         auth = "SI" if target and target.authorized else "NO"
         power = str(ap.power) if ap.power is not None else "?"
@@ -88,6 +100,38 @@ def display_networks(aps: list[AccessPoint], settings: Settings) -> None:
             f"{index:<3} {auth:<4} {ap.channel:<4} {power:<5} "
             f"{ap.privacy[:16]:<16} {ap.bssid:<18} {ap.essid}"
         )
+    if scan.clients:
+        print("\nClient associati rilevati passivamente")
+        print("BSSID              CLIENT MAC         PWR")
+        for client in scan.clients:
+            power = str(client.power) if client.power is not None else "?"
+            print(f"{client.bssid:<18} {client.mac:<18} {power}")
+
+
+def print_target_draft(scan: ScanResult, indexes: list[int]) -> None:
+    """Print a review-only configuration draft; never marks discovered targets authorized."""
+    clients_by_bssid: dict[str, list[AssociatedClient]] = {}
+    for client in scan.clients:
+        clients_by_bssid.setdefault(client.bssid, []).append(client)
+
+    print("\nBozza da rivedere prima di copiarla in config/lab.toml")
+    for index in indexes:
+        ap = scan.access_points[index - 1]
+        suffix = index
+        print("\n[[targets]]")
+        print(f'label = "da_rinominare_{suffix}"')
+        print(f'essid = "{ap.essid.replace(chr(34), chr(92) + chr(34))}"')
+        print(f'bssid = "{ap.bssid}"')
+        print(f"channel = {ap.channel}")
+        matching = clients_by_bssid.get(ap.bssid, [])
+        if matching:
+            print(f'# Client osservato: {matching[0].mac}. Verifica che sia un tuo device.')
+            print(f'client_mac = "{matching[0].mac}"')
+        else:
+            print('# Nessun client associato osservato. Aggiungilo solo dopo averlo verificato.')
+            print('client_mac = "AA:BB:CC:DD:EE:FF"')
+        print("authorized = false")
+        print("deauth_enabled = false")
 
 
 def _capture_file(prefix: Path) -> Path | None:

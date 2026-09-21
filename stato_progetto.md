@@ -12,6 +12,7 @@ Validare su Kali Linux l'MVP CLI per esperimenti controllati su WPA2 Personal, d
 - Documento DOCX impaginato e relativo script di generazione.
 - Memoria tecnica append-only tramite `scripts/append_decision.py`.
 - CLI `wifi-lab` con doctor, monitor mode, scansione, wizard interattivo, cattura, conversione e audit.
+- Fase `discover` passiva che elenca BSSID, canale, ESSID e client associati e stampa bozze TOML non autorizzate.
 - Allowlist obbligatoria, target sequenziali, singolo gruppo deauthentication e client MAC obbligatorio.
 - Procedura Kali aggiornata e script di setup.
 - Test automatici senza hardware per selezione e guardrail.
@@ -43,6 +44,7 @@ Il repository è un laboratorio Python con due sottosistemi:
 - `scripts/append_decision.py`: unico percorso consentito per il registro storico.
 - `src/wifi_lab/`: applicazione CLI.
 - `config/lab.example.toml`: schema dell'allowlist locale.
+- `config/discovery.toml`: configurazione senza target per la prima scansione.
 - `docs/KALI_SETUP.md`: installazione e aggiornamento Kali.
 
 ## Problemi noti
@@ -58,7 +60,7 @@ Il repository è un laboratorio Python con due sottosistemi:
 
 1. Rendere portabile il generatore DOCX e scegliere una singola fonte autorevole per i contenuti.
 2. Sincronizzare la sezione deauthentication tra Markdown e DOCX.
-3. Provare `doctor`, monitor mode e scansione su Kali aggiornato.
+3. Provare `discover`, monitor mode e scansione su Kali aggiornato.
 4. Validare su un hotspot di laboratorio la cattura anticipata tramite conversione HC22000.
 5. Aggiungere fixture CSV di Airodump e test del workflow con process runner simulato.
 6. Usare la checklist da telefono per la prima validazione su Kali e annotare risultati e problemi reali.
@@ -69,3 +71,4 @@ Il repository è un laboratorio Python con due sottosistemi:
 - Capture, credenziali e identificatori reali devono restare fuori dal versionamento.
 - Le azioni attive devono essere esplicite, circoscritte e rivolte a un singolo dispositivo autorizzato.
 - Le reti selezionate vengono processate in sequenza; non si eseguono deauthentication parallele.
+- La scoperta passiva non abilita automaticamente alcun target; l'autorizzazione resta una scelta esplicita dell'utente.

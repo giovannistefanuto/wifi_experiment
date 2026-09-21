@@ -14,6 +14,7 @@ from .workflow import (
     capture_target,
     display_networks,
     doctor,
+    print_target_draft,
     scan_networks,
 )
 
@@ -43,6 +44,15 @@ def parser() -> argparse.ArgumentParser:
 
     scan = sub.add_parser("scan", help="Esegue una scansione passiva")
     scan.add_argument("--seconds", type=int)
+
+    discover = sub.add_parser(
+        "discover",
+        help="Mostra reti e client associati e genera bozze TOML non autorizzate",
+    )
+    discover.add_argument("--seconds", type=int)
+    discover.add_argument(
+        "--selection", help="Reti per cui stampare la bozza, per esempio 1,2 o 1-3"
+    )
 
     wizard = sub.add_parser("wizard", help="Scansiona, seleziona e processa target autorizzati")
     wizard.add_argument("--seconds", type=int)
@@ -77,20 +87,32 @@ def main(argv: list[str] | None = None) -> int:
             return audit_hash(runner, settings, args.hash_file.resolve())
 
         seconds = args.seconds or settings.scan_seconds
-        aps = scan_networks(runner, settings, seconds)
+        scan_result = scan_networks(runner, settings, seconds)
         if args.command == "scan":
-            display_networks(aps, settings)
+            display_networks(scan_result, settings)
             return 0
 
-        display_networks(aps, settings)
-        if not aps:
+        if args.command == "discover":
+            display_networks(scan_result, settings)
+            if not scan_result.access_points:
+                print("Nessuna rete rilevata.", file=sys.stderr)
+                return 2
+            raw_selection = args.selection or input(
+                "Bozza per quali reti (es. 1,2,7 oppure 1-5): "
+            )
+            indexes = parse_selection(raw_selection, len(scan_result.access_points))
+            print_target_draft(scan_result, indexes)
+            return 0
+
+        display_networks(scan_result, settings)
+        if not scan_result.access_points:
             print("Nessuna rete rilevata.", file=sys.stderr)
             return 2
         raw_selection = args.selection or input("Selezione (es. 1,2,7 oppure 1-5): ")
-        indexes = parse_selection(raw_selection, len(aps))
+        indexes = parse_selection(raw_selection, len(scan_result.access_points))
         targets = []
         for index in indexes:
-            ap = aps[index - 1]
+            ap = scan_result.access_points[index - 1]
             target = authorized_target(ap, settings)
             if target is None or not target.authorized:
                 print(f"[RIFIUTATO] {index}: {ap.bssid} non è nell'allowlist autorizzata.")

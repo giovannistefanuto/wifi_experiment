@@ -112,3 +112,39 @@ Seguire la checklist su Kali e registrare eventuali differenze nei nomi delle in
 **Fonti / ricerca**  
 Nessuna nuova ricerca esterna; sono state consolidate le fonti già archiviate nel progetto.
 
+
+
+---
+
+### 2026-09-21 — Scoperta passiva prima dell allowlist
+
+**Obiettivo**  
+Permettere di rilevare BSSID, canale, ESSID e client associati prima di configurare i target di laboratorio.
+
+**Contesto**  
+L'allowlist iniziale richiedeva informazioni che l'utente può non conoscere prima di una scansione.
+
+**Analisi / decisione**  
+È stata introdotta una fase passiva `discover` e una configurazione senza target. La fase stampa una bozza TOML con `authorized=false` e `deauth_enabled=false`; non rende attive automaticamente reti o client osservati.
+
+**Modifiche**  
+Estesi parser CSV, modelli, workflow e CLI; creato `config/discovery.toml`; aggiornate guida, README, stato e mappa; aggiunto test della configurazione senza target.
+
+**File consultati**  
+`src/wifi_lab/scan.py`, `src/wifi_lab/workflow.py`, `src/wifi_lab/cli.py`, guida pratica e configurazione di esempio.
+
+**Test eseguiti**  
+Unit test del parser Airodump, selezione, guardrail e configurazione senza target; dry-run del comando `discover`.
+
+**Risultati**  
+L'utente può individuare passivamente i parametri della propria rete e copiare una bozza controllabile senza conoscerli in anticipo.
+
+**Problemi / limiti**  
+Un MAC osservato non prova la proprietà del dispositivo; la conferma resta manuale prima di qualunque azione attiva.
+
+**Prossimi passi**  
+Verificare la forma CSV prodotta dall'adattatore e dalla versione Airodump effettivi su Kali.
+
+**Fonti / ricerca**  
+Nessuna nuova ricerca esterna; il parser segue la struttura CSV di Airodump ng già usata dal progetto.
+

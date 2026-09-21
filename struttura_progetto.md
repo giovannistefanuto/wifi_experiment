@@ -63,6 +63,9 @@ Pacchetto Python dell'MVP. Separa configurazione, modelli validati, costruzione 
 `config/lab.example.toml`  
 Schema di configurazione senza target reali. Copiare in `config/lab.toml`, che è ignorato da Git.
 
+`config/discovery.toml`  
+Configurazione pubblica senza target, usata dal comando `discover` per la prima scansione passiva.
+
 `tests/`  
 Test senza hardware per selezione di reti e guardrail di sicurezza.
 

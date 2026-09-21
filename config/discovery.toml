@@ -1,0 +1,10 @@
+[lab]
+# Configurazione senza target: usare per la prima scoperta passiva.
+monitor_interface = "wlan0mon"
+output_dir = "../captures"
+scan_seconds = 20
+capture_timeout_seconds = 900
+deauth_delay_seconds = 5
+poll_seconds = 5
+wordlist = "/usr/share/wordlists/rockyou.txt"
+

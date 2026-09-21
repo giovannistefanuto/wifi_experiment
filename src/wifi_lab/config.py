@@ -18,9 +18,6 @@ def load_settings(path: Path) -> Settings:
 
     lab = raw.get("lab", {})
     target_rows = raw.get("targets", [])
-    if not target_rows:
-        raise ValueError("La configurazione non contiene target autorizzati.")
-
     targets = tuple(
         Target(
             label=str(row["label"]),
@@ -52,4 +49,3 @@ def load_settings(path: Path) -> Settings:
         ),
         targets=targets,
     )
-

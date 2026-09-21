@@ -40,10 +40,11 @@ Per una checklist completa e leggibile da telefono: [docs/GUIDA_DA_TELEFONO.md](
 cp config/lab.example.toml config/lab.toml
 wifi-lab --config config/lab.toml --dry-run wizard --selection 1
 sudo .venv/bin/wifi-lab --config config/lab.toml doctor
+sudo .venv/bin/wifi-lab --config config/discovery.toml discover
 sudo .venv/bin/wifi-lab --config config/lab.toml wizard --audit
 ```
 
-La CLI mostra anche reti non autorizzate durante la scansione, ma esegue workflow attivi solo per BSSID presenti in `config/lab.toml` con `authorized=true`. Le reti vengono processate in sequenza.
+La CLI `discover` rileva passivamente BSSID, canale, ESSID e client associati e stampa una bozza di configurazione da revisionare. I workflow attivi restano limitati a BSSID presenti in `config/lab.toml` con `authorized=true`. Le reti vengono processate in sequenza.
 
 ## Uso sicuro
 

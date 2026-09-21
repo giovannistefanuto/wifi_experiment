@@ -65,3 +65,16 @@ class AccessPoint:
     privacy: str
     power: int | None
     essid: str
+
+
+@dataclass(frozen=True)
+class AssociatedClient:
+    mac: str
+    bssid: str
+    power: int | None
+
+
+@dataclass(frozen=True)
+class ScanResult:
+    access_points: tuple[AccessPoint, ...]
+    clients: tuple[AssociatedClient, ...]

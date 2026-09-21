@@ -54,7 +54,24 @@ Lo script installa Aircrack-ng, hcxtools, Hashcat, TShark, Python e Git. Crea an
 
 ## Configurazione del laboratorio
 
-### 5 Crea la configurazione privata
+### 5 Scopri prima le tue reti
+
+Non devi conoscere in anticipo BSSID, canale o MAC dei client. Il progetto contiene già una configurazione senza target per la prima scoperta:
+
+```bash
+sudo .venv/bin/wifi-lab \
+  --config config/discovery.toml \
+  discover
+```
+
+Il programma elenca ESSID, BSSID, canale e client associati osservati. Alla richiesta di selezione inserisci, per esempio, `1,2,7`; stampa una bozza TOML senza autorizzare automaticamente nessuna rete.
+
+### 6 Crea la configurazione privata dopo la scoperta
+
+```bash
+cp config/lab.example.toml config/lab.toml
+nano config/lab.toml
+```
 
 ```bash
 cp config/lab.example.toml config/lab.toml
@@ -89,9 +106,11 @@ Significato importante:
 
 Non inserire una rete di terzi. Non omettere `client_mac`: l'applicativo non usa broadcast.
 
+La bozza contiene `authorized = false` e `deauth_enabled = false` proprio perché devi verificare personalmente che BSSID e client MAC siano dei tuoi dispositivi. Solo dopo aggiorna tali campi per il workflow attivo. Se non conosci o non vuoi indicare il tuo client MAC, lascia `deauth_enabled = false`: il programma effettuerà una cattura passiva fino al timeout.
+
 ## Verifica prima di trasmettere
 
-### 6 Controlla strumenti e configurazione
+### 7 Controlla strumenti e configurazione
 
 ```bash
 sudo .venv/bin/wifi-lab --config config/lab.toml doctor
@@ -99,7 +118,7 @@ sudo .venv/bin/wifi-lab --config config/lab.toml doctor
 
 Devi vedere `OK` per `iw`, `airmon-ng`, `airodump-ng`, `aireplay-ng`, `hcxpcapngtool`, `hashcat` e `tshark`.
 
-### 7 Simula tutto senza usare la scheda WiFi
+### 8 Simula tutto senza usare la scheda WiFi
 
 ```bash
 .venv/bin/wifi-lab \
@@ -111,7 +130,7 @@ Il dry-run stampa i comandi che sarebbero eseguiti ma non cattura e non trasmett
 
 ## Sessione pratica
 
-### 8 Attiva monitor mode
+### 9 Attiva monitor mode
 
 ```bash
 sudo .venv/bin/wifi-lab \
@@ -135,7 +154,7 @@ sudo .venv/bin/wifi-lab \
   monitor-start wlan0 --stop-conflicts
 ```
 
-### 9 Scansiona passivamente
+### 10 Scansiona passivamente
 
 ```bash
 sudo .venv/bin/wifi-lab \
@@ -147,7 +166,7 @@ L'output mostra l'ID temporaneo, il canale, il BSSID, l'ESSID e se la rete è au
 
 Se il canale reale differisce da quello nel file TOML, aggiorna prima `config/lab.toml`. Il programma rifiuta un target con canale diverso per evitare di agire sulla rete sbagliata.
 
-### 10 Esegui il wizard
+### 11 Esegui il wizard
 
 ```bash
 sudo .venv/bin/wifi-lab \
@@ -175,7 +194,7 @@ Per ogni target autorizzato, il programma:
 
 I file vengono salvati in `captures/sessions/`. Non caricarli su GitHub.
 
-### 11 Audit opzionale con RockYou
+### 12 Audit opzionale con RockYou
 
 Per avviare Hashcat automaticamente dopo una conversione riuscita:
 
@@ -191,7 +210,7 @@ Un risultato negativo significa solo che la password non era nel dizionario usat
 
 ## Alla fine
 
-### 12 Arresta monitor mode e ripristina la rete
+### 13 Arresta monitor mode e ripristina la rete
 
 ```bash
 sudo .venv/bin/wifi-lab \
@@ -247,4 +266,3 @@ sudo .venv/bin/wifi-lab --config config/lab.toml monitor-stop wlan0mon --restore
 - Le capture contengono metadati sensibili: trattale come dati di laboratorio privati.
 
 Per approfondire la teoria, leggi `Sicurezza_delle_reti_WiFi_e_verifica_WPA.md`. Per i dettagli sulle fonti Kali e HC22000, leggi `docs/KALI_SETUP.md`.
-
