@@ -51,7 +51,7 @@ python -m unittest discover -s tests -v
 wifi-lab --config config/lab.example.toml --dry-run wizard --selection 1
 ```
 
-I test automatici coprono selezione e guardrail dei comandi radio senza usare hardware. La generazione DOCX richiede `python-docx`; il risultato deve essere aperto o renderizzato e controllato visivamente.
+I test automatici coprono configurazione, selezione, parsing, guardrail, errori dei processi esterni e recupero da artefatti corrotti senza usare hardware. La generazione DOCX richiede `python-docx`; il risultato deve essere aperto o renderizzato e controllato visivamente.
 
 ## Memoria tecnica
 

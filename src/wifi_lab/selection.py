@@ -17,15 +17,27 @@ def parse_selection(value: str, maximum: int) -> list[int]:
             continue
         if "-" in token:
             left, right = token.split("-", 1)
-            start, end = int(left), int(right)
+            try:
+                start, end = int(left), int(right)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Intervallo non valido {token!r}; usare per esempio 1-3."
+                ) from exc
             if start > end:
                 raise ValueError(f"Intervallo inverso: {token}")
             selected.update(range(start, end + 1))
         else:
-            selected.add(int(token))
+            try:
+                selected.add(int(token))
+            except ValueError as exc:
+                raise ValueError(
+                    f"Selezione non valida {token!r}; usare numeri, virgole o intervalli."
+                ) from exc
+
+    if not selected:
+        raise ValueError("La selezione non contiene alcun indice valido.")
 
     invalid = sorted(item for item in selected if item < 1 or item > maximum)
     if invalid:
         raise ValueError(f"Indici fuori intervallo: {invalid}")
     return sorted(selected)
-

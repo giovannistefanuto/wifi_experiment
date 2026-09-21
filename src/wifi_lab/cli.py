@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import argparse
 import sys
+import traceback
 from pathlib import Path
 
-from .commands import deauth_command
 from .config import load_settings
+from .errors import WifiLabError
 from .runner import CommandRunner
 from .selection import parse_selection
 from .workflow import (
@@ -23,6 +24,11 @@ def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(prog="wifi-lab")
     result.add_argument("--config", type=Path, default=Path("config/lab.toml"))
     result.add_argument("--dry-run", action="store_true")
+    result.add_argument(
+        "--debug",
+        action="store_true",
+        help="Mostra il traceback completo per errori inattesi",
+    )
     sub = result.add_subparsers(dest="command", required=True)
 
     sub.add_parser("doctor", help="Controlla sistema, strumenti e configurazione")
@@ -64,6 +70,16 @@ def parser() -> argparse.ArgumentParser:
     return result
 
 
+def _read_selection(prompt: str) -> str:
+    try:
+        return input(prompt)
+    except EOFError as exc:
+        raise WifiLabError(
+            "Input interattivo non disponibile. Usare --selection, per esempio "
+            "--selection 1,2 oppure --selection all."
+        ) from exc
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
@@ -74,15 +90,18 @@ def main(argv: list[str] | None = None) -> int:
             return 0 if doctor(runner, settings) else 1
         if args.command == "monitor-start":
             if args.stop_conflicts:
-                code = runner.run(["airmon-ng", "check", "kill"]).returncode
-                if code != 0:
-                    return code
-            return runner.run(["airmon-ng", "start", args.interface]).returncode
+                runner.run(["airmon-ng", "check", "kill"], check=True, stream=True)
+            runner.run(["airmon-ng", "start", args.interface], check=True, stream=True)
+            return 0
         if args.command == "monitor-stop":
-            code = runner.run(["airmon-ng", "stop", args.interface]).returncode
-            if code == 0 and args.restore_network:
-                code = runner.run(["systemctl", "restart", "NetworkManager"]).returncode
-            return code
+            runner.run(["airmon-ng", "stop", args.interface], check=True, stream=True)
+            if args.restore_network:
+                runner.run(
+                    ["systemctl", "restart", "NetworkManager"],
+                    check=True,
+                    stream=True,
+                )
+            return 0
         if args.command == "audit":
             return audit_hash(runner, settings, args.hash_file.resolve())
 
@@ -97,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
             if not scan_result.access_points:
                 print("Nessuna rete rilevata.", file=sys.stderr)
                 return 2
-            raw_selection = args.selection or input(
+            raw_selection = args.selection or _read_selection(
                 "Bozza per quali reti (es. 1,2,7 oppure 1-5): "
             )
             indexes = parse_selection(raw_selection, len(scan_result.access_points))
@@ -108,7 +127,9 @@ def main(argv: list[str] | None = None) -> int:
         if not scan_result.access_points:
             print("Nessuna rete rilevata.", file=sys.stderr)
             return 2
-        raw_selection = args.selection or input("Selezione (es. 1,2,7 oppure 1-5): ")
+        raw_selection = args.selection or _read_selection(
+            "Selezione (es. 1,2,7 oppure 1-5): "
+        )
         indexes = parse_selection(raw_selection, len(scan_result.access_points))
         targets = []
         for index in indexes:
@@ -132,21 +153,42 @@ def main(argv: list[str] | None = None) -> int:
         failures = 0
         for target in targets:
             print(f"\n=== Target {target.label} {target.bssid} ===")
-            hash_file = capture_target(runner, settings, target)
-            if not hash_file:
-                failures += 1
-                continue
-            if args.audit:
-                code = audit_hash(runner, settings, hash_file)
-                if code not in (0, 1):
+            try:
+                hash_file = capture_target(runner, settings, target)
+                if not hash_file:
                     failures += 1
+                    continue
+                if args.audit:
+                    code = audit_hash(runner, settings, hash_file)
+                    if code not in (0, 1):
+                        failures += 1
+            except (WifiLabError, ValueError) as exc:
+                failures += 1
+                print(
+                    f"[ERRORE TARGET] {target.label}: {exc}\n"
+                    "Il target viene saltato; il wizard prosegue con il successivo.",
+                    file=sys.stderr,
+                )
+        print(
+            f"\nRiepilogo: {len(targets) - failures} completati, "
+            f"{failures} non completati su {len(targets)} target."
+        )
         return 1 if failures else 0
     except KeyboardInterrupt:
         print("Interrotto dall'utente.", file=sys.stderr)
         return 130
-    except Exception as exc:
+    except (WifiLabError, ValueError) as exc:
         print(f"Errore: {exc}", file=sys.stderr)
         return 2
+    except Exception as exc:
+        print(
+            f"Errore inatteso ({type(exc).__name__}): {exc}\n"
+            "Rieseguire con --debug e conservare il traceback e i log della sessione.",
+            file=sys.stderr,
+        )
+        if getattr(args, "debug", False):
+            traceback.print_exc()
+        return 70
 
 
 if __name__ == "__main__":

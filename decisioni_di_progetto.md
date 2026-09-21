@@ -148,3 +148,36 @@ Verificare la forma CSV prodotta dall'adattatore e dalla versione Airodump effet
 **Fonti / ricerca**  
 Nessuna nuova ricerca esterna; il parser segue la struttura CSV di Airodump ng già usata dal progetto.
 
+
+
+---
+
+### 2026-09-21 — Gestione robusta e osservabile degli errori CLI
+
+**Obiettivo**  
+Evitare errori silenziosi e rendere recuperabili o diagnosticabili i guasti del laboratorio.
+
+**Contesto**  
+La CLI orchestrava strumenti Kali esterni ma non distingueva configurazioni errate, tool assenti, processi terminati, conversioni fallite e problemi di filesystem.
+
+**Analisi / decisione**  
+Introdotte eccezioni applicative con messaggi operativi, controlli espliciti degli exit code e dei processi Airodump, log contestuali, cleanup atomico e isolamento degli errori per singolo target. Gli errori inattesi usano exit code 70 e mostrano il traceback solo con `--debug`.
+
+**Modifiche**  
+Aggiornati configurazione, runner, workflow, CLI, selezione, documentazione e memoria corrente. Aggiunti `src/wifi_lab/errors.py` e test mirati per configurazione, processi esterni e workflow d'errore.
+
+**File consultati**  
+`src/wifi_lab/`, `tests/`, `config/lab.example.toml`, `docs/GUIDA_DA_TELEFONO.md`.
+
+**Test eseguiti**  
+`py -3.12 -m compileall -q src tests scripts build_wifi_security_doc.py`; `py -3.12 -m unittest discover -s tests -v`; wizard dry-run su due target; `git diff --check`.
+
+**Risultati**  
+23 test superati; dry-run multi-target completato; configurazione mancante e selezione errata producono messaggi chiari ed exit code 2.
+
+**Problemi / limiti**  
+I percorsi reali di errore dei driver e degli strumenti radio devono ancora essere validati su hardware Kali.
+
+**Prossimi passi**  
+Eseguire una sessione Kali controllata e aggiungere fixture per l'uscita anticipata di Airodump e il batch multi-target.
+

@@ -46,6 +46,12 @@ sudo .venv/bin/wifi-lab --config config/lab.toml wizard --audit
 
 La CLI `discover` rileva passivamente BSSID, canale, ESSID e client associati e stampa una bozza di configurazione da revisionare. I workflow attivi restano limitati a BSSID presenti in `config/lab.toml` con `authorized=true`. Le reti vengono processate in sequenza.
 
+Gli errori previsti sono mostrati con una spiegazione operativa e un exit code non zero. Per un errore inatteso, ripetere il comando aggiungendo `--debug`; i log delle sessioni rimangono sotto `captures/`. Per eseguire i test senza hardware:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
 ## Uso sicuro
 
 Le procedure radio descritte sono destinate a un laboratorio autorizzato. Non usare il materiale per interferire con reti, access point o client di terzi. Capture, password, indirizzi MAC reali e dizionari non devono essere aggiunti al repository.

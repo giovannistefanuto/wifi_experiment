@@ -17,7 +17,14 @@ class SelectionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_selection("4", 3)
 
+    def test_malformed_range_has_clear_error(self):
+        with self.assertRaisesRegex(ValueError, "Intervallo non valido"):
+            parse_selection("uno-tre", 3)
+
+    def test_empty_tokens_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "alcun indice"):
+            parse_selection(",,", 3)
+
 
 if __name__ == "__main__":
     unittest.main()
-

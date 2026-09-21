@@ -233,6 +233,25 @@ Sostituisci `wlan0mon` con il nome effettivo della tua interfaccia monitor.
 | Nessun HC22000 viene creato | Verifica che il client si sia riconnesso, che la capture contenga EAPOL e che `hcxpcapngtool` sia installato. |
 | Hashcat non trova nulla | La password potrebbe non essere nel dizionario; non è un errore della conversione. |
 
+## Come leggere gli errori
+
+- `Errore:` indica un problema previsto e correggibile, per esempio configurazione mancante, selezione non valida, file vuoto, permessi o tool assente. Il testo indica il file o il comando coinvolto.
+- `[ERRORE TARGET]` riguarda una sola rete: il wizard la salta e continua con le altre selezionate. Il riepilogo finale mostra quanti target non sono stati completati.
+- `Errore inatteso (...)` indica un caso non previsto. Ripeti lo stesso comando aggiungendo l'opzione globale `--debug` prima del sottocomando e conserva il traceback.
+- Se Airodump termina in anticipo, il messaggio mostra il percorso di `airodump.log` e le ultime righe utili. I log sono dentro `captures/scans/` o `captures/sessions/`.
+- Un exit code `0` indica successo; `1` può indicare un batch incompleto o, per Hashcat, dizionario esaurito; `2` indica input/configurazione non valida; `70` è riservato agli errori inattesi; `130` indica interruzione con Ctrl+C.
+
+Esempio diagnostico:
+
+```bash
+sudo .venv/bin/wifi-lab \
+  --config config/lab.toml \
+  --debug \
+  wizard --selection 1,2
+```
+
+La decompressione di RockYou usa un file temporaneo: se l'archivio è corrotto o la scrittura fallisce, il programma non lascia una wordlist parziale utilizzabile. Non cancellare i log prima di aver letto l'errore.
+
 ## Comandi da ricordare
 
 ```bash

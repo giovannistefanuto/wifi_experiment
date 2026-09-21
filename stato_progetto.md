@@ -14,8 +14,9 @@ Validare su Kali Linux l'MVP CLI per esperimenti controllati su WPA2 Personal, d
 - CLI `wifi-lab` con doctor, monitor mode, scansione, wizard interattivo, cattura, conversione e audit.
 - Fase `discover` passiva che elenca BSSID, canale, ESSID e client associati e stampa bozze TOML non autorizzate.
 - Allowlist obbligatoria, target sequenziali, singolo gruppo deauthentication e client MAC obbligatorio.
+- Gestione esplicita degli errori di configurazione, processi esterni, timeout, permessi, log, conversione e wordlist; un errore per target non interrompe il resto del batch.
 - Procedura Kali aggiornata e script di setup.
-- Test automatici senza hardware per selezione e guardrail.
+- Test automatici senza hardware per configurazione, selezione, parsing, process runner, workflow d'errore e guardrail.
 
 ## Architettura corrente
 
@@ -62,7 +63,7 @@ Il repository è un laboratorio Python con due sottosistemi:
 2. Sincronizzare la sezione deauthentication tra Markdown e DOCX.
 3. Provare `discover`, monitor mode e scansione su Kali aggiornato.
 4. Validare su un hotspot di laboratorio la cattura anticipata tramite conversione HC22000.
-5. Aggiungere fixture CSV di Airodump e test del workflow con process runner simulato.
+5. Aggiungere test integrati del ciclo Airodump con processo simulato e dei batch multi-target.
 6. Usare la checklist da telefono per la prima validazione su Kali e annotare risultati e problemi reali.
 
 ## Decisioni recenti da conoscere
@@ -72,3 +73,4 @@ Il repository è un laboratorio Python con due sottosistemi:
 - Le azioni attive devono essere esplicite, circoscritte e rivolte a un singolo dispositivo autorizzato.
 - Le reti selezionate vengono processate in sequenza; non si eseguono deauthentication parallele.
 - La scoperta passiva non abilita automaticamente alcun target; l'autorizzazione resta una scelta esplicita dell'utente.
+- Gli errori previsti usano eccezioni applicative e messaggi operativi; gli errori inattesi espongono il traceback solo con `--debug`.

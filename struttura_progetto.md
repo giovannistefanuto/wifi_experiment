@@ -58,7 +58,7 @@ Controlla Kali, ripara esplicitamente il keyring ufficiale e installa i pacchett
 ## Applicazione CLI
 
 `src/wifi_lab/`  
-Pacchetto Python dell'MVP. Separa configurazione, modelli validati, costruzione dei comandi, esecuzione dei processi, parsing della scansione e workflow. Le azioni attive richiedono allowlist, client MAC e un singolo gruppo deauthentication.
+Pacchetto Python dell'MVP. Separa configurazione, modelli validati, costruzione dei comandi, esecuzione dei processi, errori applicativi, parsing della scansione e workflow. `errors.py` definisce gli errori leggibili dalla CLI; `runner.py` traduce i guasti dei processi esterni e `workflow.py` gestisce log, cleanup e recuperi localizzati. Le azioni attive richiedono allowlist, client MAC e un singolo gruppo deauthentication.
 
 `config/lab.example.toml`  
 Schema di configurazione senza target reali. Copiare in `config/lab.toml`, che Ã¨ ignorato da Git.
@@ -67,7 +67,7 @@ Schema di configurazione senza target reali. Copiare in `config/lab.toml`, che Ã
 Configurazione pubblica senza target, usata dal comando `discover` per la prima scansione passiva.
 
 `tests/`  
-Test senza hardware per selezione di reti e guardrail di sicurezza.
+Test senza hardware per configurazione, selezione, parsing CSV, process runner, wordlist/HC22000 e guardrail di sicurezza.
 
 `docs/KALI_SETUP.md`  
 Procedura aggiornata per Kali, chiave archivio, dipendenze, installazione e avvio.
