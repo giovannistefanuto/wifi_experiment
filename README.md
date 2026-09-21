@@ -34,6 +34,8 @@ Il generatore contiene attualmente un percorso Windows assoluto; consultare `sta
 
 Consultare [docs/KALI_SETUP.md](docs/KALI_SETUP.md) per aggiornamento della distribuzione, keyring, installazione degli strumenti e configurazione.
 
+Per una checklist completa e leggibile da telefono: [docs/GUIDA_DA_TELEFONO.md](docs/GUIDA_DA_TELEFONO.md).
+
 ```bash
 cp config/lab.example.toml config/lab.toml
 wifi-lab --config config/lab.toml --dry-run wizard --selection 1

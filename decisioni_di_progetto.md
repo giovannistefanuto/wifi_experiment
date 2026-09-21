@@ -76,3 +76,39 @@ Provare `doctor` e scansione su Kali aggiornato, poi una cattura su un singolo h
 **Fonti / ricerca**  
 Kali Updating, Kali archive signing key, Kali 2026.2 repository format, repository hcxtools e documentazione Hashcat mode 22000.
 
+
+
+---
+
+### 2026-09-21 — Guida pratica da telefono per Kali
+
+**Obiettivo**  
+Creare un unico documento operativo consultabile da telefono durante una sessione su Kali Linux.
+
+**Contesto**  
+Le istruzioni erano distribuite tra README, guida Kali, configurazione e documentazione tecnica. Il primo utilizzo richiede una sequenza lineare e una sezione di troubleshooting.
+
+**Analisi / decisione**  
+È stata aggiunta una checklist separata dalla teoria, con comandi ordinati, punti di controllo, limiti del workflow e protezione dei target autorizzati.
+
+**Modifiche**  
+Creati `docs/GUIDA_DA_TELEFONO.md`; aggiornati README, stato e mappa del repository.
+
+**File consultati**  
+`README.md`, `docs/KALI_SETUP.md`, `config/lab.example.toml`, `stato_progetto.md`, `struttura_progetto.md`.
+
+**Test eseguiti**  
+Verifica delle sezioni, dei comandi principali e del collegamento dal README.
+
+**Risultati**  
+Il progetto dispone di una guida autonoma per preparazione, configurazione, esecuzione e ripristino.
+
+**Problemi / limiti**  
+I comandi radio richiedono ancora validazione su Kali e hardware compatibile.
+
+**Prossimi passi**  
+Seguire la checklist su Kali e registrare eventuali differenze nei nomi delle interfacce o nei pacchetti disponibili.
+
+**Fonti / ricerca**  
+Nessuna nuova ricerca esterna; sono state consolidate le fonti già archiviate nel progetto.
+

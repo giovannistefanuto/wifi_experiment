@@ -51,7 +51,7 @@ Il repository è un laboratorio Python con due sottosistemi:
 - Markdown e DOCX non sono sincronizzati: la sezione estesa sulla deauthentication è presente nel Markdown ma non ancora nel generatore DOCX.
 - I workflow radio non sono ancora stati provati su hardware Kali reale.
 - Non esiste ancora uno schema per metadati degli esperimenti o per anonimizzare capture e indirizzi MAC.
-- Il repository Git locale è inizializzato sulla branch `main`, ma non ha ancora commit né remote GitHub.
+- Il repository Git è pubblicato su GitHub nella branch `main`.
 - Gli artefatti in `.docx_render/` sono generati e non devono diventare fonte primaria.
 
 ## Prossime milestone
@@ -61,7 +61,7 @@ Il repository è un laboratorio Python con due sottosistemi:
 3. Provare `doctor`, monitor mode e scansione su Kali aggiornato.
 4. Validare su un hotspot di laboratorio la cattura anticipata tramite conversione HC22000.
 5. Aggiungere fixture CSV di Airodump e test del workflow con process runner simulato.
-6. Creare il primo commit e collegare un remote GitHub quando il proprietario sceglie nome e visibilità.
+6. Usare la checklist da telefono per la prima validazione su Kali e annotare risultati e problemi reali.
 
 ## Decisioni recenti da conoscere
 

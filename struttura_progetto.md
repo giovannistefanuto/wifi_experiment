@@ -69,6 +69,9 @@ Test senza hardware per selezione di reti e guardrail di sicurezza.
 `docs/KALI_SETUP.md`  
 Procedura aggiornata per Kali, chiave archivio, dipendenze, installazione e avvio.
 
+`docs/GUIDA_DA_TELEFONO.md`  
+Checklist operativa autonoma e lineare per preparare Kali, configurare il laboratorio, usare il wizard e risolvere problemi comuni. È il documento da consultare durante una sessione pratica.
+
 ## Materiale fornito manualmente
 
 `GIOVANNI_INBOX/`  
