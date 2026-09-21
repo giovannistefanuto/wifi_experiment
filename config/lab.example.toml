@@ -1,0 +1,30 @@
+[lab]
+monitor_interface = "wlan0mon"
+output_dir = "../captures"
+scan_seconds = 20
+capture_timeout_seconds = 900
+deauth_delay_seconds = 5
+poll_seconds = 5
+wordlist = "/usr/share/wordlists/rockyou.txt"
+
+# Copiare questo file in config/lab.toml e sostituire esclusivamente con reti
+# e client propri o formalmente autorizzati. Non committare lab.toml.
+
+[[targets]]
+label = "hotspot_test_1"
+essid = "LAB_WIFI_1"
+bssid = "02:00:00:00:01:00"
+channel = 6
+client_mac = "02:00:00:00:01:01"
+authorized = true
+deauth_enabled = true
+
+[[targets]]
+label = "hotspot_test_2"
+essid = "LAB_WIFI_2"
+bssid = "02:00:00:00:02:00"
+channel = 11
+client_mac = "02:00:00:00:02:01"
+authorized = true
+deauth_enabled = false
+

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Segreti e configurazioni locali
+.env
+.env.*
+!.env.example
+config/lab.toml
+*.key
+*.pem
+
+# Artefatti documentali temporanei
+.docx_render/
+tmp/
+*.tmp
+~$*.docx
+
+# Capture e output radio potenzialmente sensibili
+captures/
+*.cap
+*.pcap
+*.pcapng
+*.ivs
+*.netxml
+*.kismet.csv
+*.kismet.netxml
+
+# Dizionari e dataset locali
+wordlists/
+rockyou.txt
+rockyou.txt.gz
+
+# IDE e sistema operativo
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
